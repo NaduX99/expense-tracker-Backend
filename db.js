@@ -1,28 +1,27 @@
-// db.js – MySQL connection pool
 const mysql = require('mysql2/promise');
 require('dotenv').config();
 
 const pool = mysql.createPool({
-  host:               process.env.DB_HOST     || 'localhost',
-  port:               parseInt(process.env.DB_PORT || '3306'),
-  user:               process.env.DB_USER     || 'root',
-  password:           process.env.DB_PASSWORD || '',
-  database:           process.env.DB_NAME     || 'smart_expense_db',
+  host: process.env.DB_HOST || 'localhost',
+  port: parseInt(process.env.DB_PORT || '3306'),
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASSWORD || '',
+  database: process.env.DB_NAME || 'smart_expense_db',
   waitForConnections: true,
-  connectionLimit:    10,
-  queueLimit:         0,
-  charset:            'utf8mb4'
+  connectionLimit: 10,
+  queueLimit: 0,
+  charset: 'utf8mb4'
 });
 
-// Test connection on startup
+// Test connection (NON-FATAL)
 pool.getConnection()
   .then(conn => {
-    console.log('✅  MySQL connected – database:', process.env.DB_NAME);
+    console.log('✅ MySQL connected – database:', process.env.DB_NAME);
     conn.release();
   })
   .catch(err => {
-    console.error('❌  MySQL connection failed:', err.message);
-    process.exit(1);
+    console.error('❌ MySQL connection failed:', err.message);
+    console.log('⚠️ Server will continue without DB crash');
   });
 
 module.exports = pool;
