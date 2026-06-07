@@ -13,32 +13,54 @@ const aiRoutes = require('./routes/ai.routes');
 
 const app = express();
 
-// Middleware
-app.use(cors());
+// ======================
+// MIDDLEWARE
+// ======================
+app.use(cors({
+  origin: process.env.FRONTEND_URL || '*',
+  credentials: true
+}));
+
 app.use(express.json());
 
-// Public Routes
+// ======================
+// ROUTES
+// ======================
+
+// Public
 app.use('/api/auth', authRoutes);
 
-// Protected Routes
+// Protected
 app.use('/api/expenses', authGuard, expenseRoutes);
 app.use('/api/budgets', authGuard, budgetRoutes);
 app.use('/api/income', authGuard, incomeRoutes);
 app.use('/api/dashboard', authGuard, dashboardRoutes);
 app.use('/api/ai', authGuard, aiRoutes);
 
-// Health Check
+// ======================
+// HEALTH CHECK
+// ======================
 app.get('/api/health', (req, res) => {
-  res.json({ success: true, message: 'Smart Expense API is running!' });
+  res.json({
+    success: true,
+    message: 'Smart Expense API is running!'
+  });
 });
 
-// Error handling middleware
+// ======================
+// ERROR HANDLER
+// ======================
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ success: false, message: 'Internal Server Error' });
+  console.error('Error:', err.message);
+  res.status(500).json({
+    success: false,
+    message: 'Internal Server Error'
+  });
 });
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`ðŸš€ Server running on port ${PORT}`);
-});
+// ❌ REMOVE app.listen (Vercel does NOT allow it)
+
+// ======================
+// EXPORT (IMPORTANT FOR VERCEL)
+// ======================
+module.exports = app;
