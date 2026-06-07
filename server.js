@@ -24,13 +24,33 @@ app.use(cors({
 app.use(express.json());
 
 // ======================
-// ROUTES
+// BASIC ROUTES
 // ======================
 
-// Public
+// Root route (fix 404 error)
+app.get('/', (req, res) => {
+  res.json({
+    success: true,
+    message: '🚀 Expense Tracker API is running'
+  });
+});
+
+// Health check
+app.get('/api/health', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Smart Expense API is healthy'
+  });
+});
+
+// ======================
+// PUBLIC ROUTES
+// ======================
 app.use('/api/auth', authRoutes);
 
-// Protected
+// ======================
+// PROTECTED ROUTES
+// ======================
 app.use('/api/expenses', authGuard, expenseRoutes);
 app.use('/api/budgets', authGuard, budgetRoutes);
 app.use('/api/income', authGuard, incomeRoutes);
@@ -38,29 +58,19 @@ app.use('/api/dashboard', authGuard, dashboardRoutes);
 app.use('/api/ai', authGuard, aiRoutes);
 
 // ======================
-// HEALTH CHECK
-// ======================
-app.get('/api/health', (req, res) => {
-  res.json({
-    success: true,
-    message: 'Smart Expense API is running!'
-  });
-});
-
-// ======================
 // ERROR HANDLER
 // ======================
 app.use((err, req, res, next) => {
-  console.error('Error:', err.message);
+  console.error('❌ Error:', err.message);
   res.status(500).json({
     success: false,
     message: 'Internal Server Error'
   });
 });
 
-// ❌ REMOVE app.listen (Vercel does NOT allow it)
+// ❌ IMPORTANT: NO app.listen() for Vercel
 
 // ======================
-// EXPORT (IMPORTANT FOR VERCEL)
+// EXPORT APP (REQUIRED FOR VERCEL)
 // ======================
 module.exports = app;
